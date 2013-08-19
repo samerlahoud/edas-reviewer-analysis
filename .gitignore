@@ -1,6 +1,9 @@
-
 reviewer_analysis-v1.py
 
 reviewer_analysis-v2.py
 
 reviewer_analysis_118404.csv
+
+.DS_Store
+
+.gitignore
