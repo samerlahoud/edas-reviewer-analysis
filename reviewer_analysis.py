@@ -29,13 +29,15 @@ author_id = re.findall(r'\d+', conf_list_soup.title.string)[0]
 paper_refs = conf_list_soup.find_all(title="Show paper", href=True)
 
 # Initialise the publication dictionary: 
-# key = conference short name, value = (total review length, total nb reviewers, mean review length, paper status)
+# key = conference short name, value = (total review length, total nb reviewers, mean review length, paper status, pID)
 publication_dict = {}
 
 for l in paper_refs:
 	# Get the paper page
+	# Verify = True if SSL problem
 	conf_request = current_session.get('https://edas.info/'+l['href'], verify=True)
 	conf_soup = BeautifulSoup(conf_request.text)
+	pID = re.findall(r'\d+', l['href'])[0]
 	
 	# Get the status of the paper
 	paper_status_tag = conf_soup.find('td', text=re.compile(r'Status'))
@@ -60,7 +62,7 @@ for l in paper_refs:
 		mean_review_length = total_review_length/total_nb_reviewers
 	else:
 		mean_review_length = 0
-	publication_dict[conference_short_title] = [total_review_length, total_nb_reviewers, mean_review_length, paper_status]
+	publication_dict[conference_short_title] = [total_review_length, total_nb_reviewers, mean_review_length, paper_status, pID]
 
 # Get a counter of publications	sorted per status
 publication_counter = Counter([x[3] for x in publication_dict.values()])
@@ -75,7 +77,7 @@ publication_ordered_dict = OrderedDict(sorted(publication_dict.items(), key=lamb
 
 # Open a CSV file and write the review analysis and close it automatically below
 with open('reviewer_analysis_'+author_id+'.csv', 'w') as f:
-	f.write('Conference Name, Total Review Length, Number of Reviewers, Mean Review Length, Paper Status\n')
+	f.write('Conference Name, Total Review Length, Number of Reviewers, Mean Review Length, Paper Status, pID\n')
 	l = []
 	
 	# Iterate over items returning key, value tuples
@@ -84,6 +86,6 @@ with open('reviewer_analysis_'+author_id+'.csv', 'w') as f:
 		# Silently discard pending or active papers
 		if v[3] == 'paper-rejected' or v[3] == 'paper-accepted' or v[3] == 'paper-published':
 			# Build a nice list of strings
-			l.append('%s, %s, %s, %s, %s' % (str(k), str(v[0]), str(v[1]), str(v[2]), str(v[3]))) 
+			l.append('%s, %s, %s, %s, %s, %s' % (str(k), str(v[0]), str(v[1]), str(v[2]), str(v[3]), str(v[4]))) 
 	 # Join that list of strings and write out
 	f.write('\n'.join(l))                    
