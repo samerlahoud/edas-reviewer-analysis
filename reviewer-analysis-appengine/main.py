@@ -113,7 +113,7 @@ def fetch_edas(request):
 	# Iterate over items returning key, value tuples
 	for k, v in publication_ordered_dict.iteritems():
 		# Silently discard pending or active papers
-		if v[3] == 'paper-rejected' or v[3] == 'paper-accepted' or v[3] == 'paper-published':
+		if v[3] == 'paper-rejected' or v[3] == 'paper-accepted' or v[3] == 'paper-published' or v[3] == 'paper-major_revision':
 			# Build a nice list of strings
 			l.append('<tr><td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td> <td>%s</td></tr>' % (str(k), str(v[0]), str(v[1]), str(v[2]), str(v[3]), str(v[4]))) 
 	# Join that list of strings and write out
